@@ -1,3 +1,6 @@
+#git credentials files
+.git-credentials
+
 # phpstorm project files
 .idea
 
