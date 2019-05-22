@@ -17,15 +17,19 @@ use yii\web\AssetBundle;
  */
 class AppAsset extends AssetBundle
 {
+    public $jsOptions = ['position' => \yii\web\View::POS_HEAD];
+
     public $basePath = '@webroot';
     public $baseUrl = '@web';
     public $css = [
         'css/site.css',
+        'css/bootstrap.min.css',
     ];
     public $js = [
+        'js/chart/chart.bundle.min.js',
+        'js/main.js',
     ];
     public $depends = [
         'yii\web\YiiAsset',
-        'yii\bootstrap\BootstrapAsset',
     ];
 }
