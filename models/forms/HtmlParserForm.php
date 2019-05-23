@@ -82,7 +82,7 @@ class HtmlParserForm extends Model
         $rows = $html->find('tr');
 
         if (!$this->rowsFormatMatches($rows)) {
-            $this->addError('file', "Не удалось обнаружить необходимое количество строк в файле. Ожидается, что значения будут указаны в {$this->value_col} строке");
+            $this->addError('file', "Не удалось обнаружить необходимое количество строк в файле. Ожидается, что значения будут указаны начиная со строки номер {$this->value_row} строке");
             return false;
         }
 
