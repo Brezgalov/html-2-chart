@@ -10,8 +10,9 @@ $this->title = 'Парсер html в график';
 </div>
 <div id="description-row" class="row">
     <div class="col-md-12">
-        <h4>Значиния берутся начиная со столбца номер: <?= $parserForm->value_row ?></h4>
-        <h4>Минимальное кол-во столбцов в строке: <?= $parserForm->min_columns ?></h4>
+        <h5>Значиния берутся начиная со столбца номер: <?= $parserForm->value_row ?></h5>
+        <h5>Значения прекратят выбираться, когда в первом столбце появится строка не состоящая целиком из цифр</h5>
+        <h5>Минимальное кол-во столбцов в строке: <?= $parserForm->min_columns ?></h5>
     </div>
 </div>
 <hr/>
@@ -33,7 +34,8 @@ $this->title = 'Парсер html в график';
 <?php if (isset($parseResult) && !empty($parseResult)): ?>
     <div id="time-row" class="row">
         <div class="col-md-12">
-            <h5>Парсинг занял: <?= round($parserForm->getLastParseTime(), 3) ?></h5>
+            <h5 class="d-inline-block">Парсинг занял: <?= round($parserForm->getLastParseTime(), 2) ?> сек;</h5>
+            <h5 class="d-inline-block">Точек найдено: <?= count($parseResult) ?>;</h5>
         </div>
     </div>
     <hr/>
@@ -42,5 +44,8 @@ $this->title = 'Парсер html в график';
             <canvas id="myChart"></canvas>
         </div>
     </div>
-    <script>drawChart([JSON.parse(<?= json_encode($parseResult) ?>)])</script>
+    <script>
+        $(document).ready(function () {
+            drawChart(JSON.parse('<?php echo json_encode($parseResult) ?>'));
+        })</script>
 <?php endif; ?>
