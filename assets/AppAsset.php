@@ -24,6 +24,7 @@ class AppAsset extends AssetBundle
     public $css = [
         'css/site.css',
         'css/bootstrap.min.css',
+        'css/main.css',
     ];
     public $js = [
         'js/chart/chart.bundle.min.js',
