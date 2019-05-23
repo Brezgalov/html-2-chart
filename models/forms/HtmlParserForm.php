@@ -86,10 +86,20 @@ class HtmlParserForm extends Model
             return false;
         }
 
+        $debugData = [];
         $resultData = [];
         $balance = 0;
         foreach (array_slice($rows, $this->value_row) as $i => $row) {
             $columns = $row->find('td');
+            $debugData[$i] = [
+                'row' => $i + 1,
+                'columns' => count($columns),
+                'text' => $row->plaintext,
+                'point' => null,
+                'lastval' => null,
+                'balance' => $balance,
+            ];
+
             if (!$this->columnsFormatMatches($columns)) {
                 continue;
             }
@@ -97,9 +107,18 @@ class HtmlParserForm extends Model
                 break;
             }
 
-            $last = array_pop($columns);
-            $balance += floatval($last->plaintext);
-            $resultData[] = [
+            $lastColumn = array_pop($columns);
+            $lastVal = str_replace(' ', '', $lastColumn->plaintext);
+            preg_match('/^-?[0-9]+.?[0-9]*$/', $lastVal, $lastValMatches);
+            if (empty($lastValMatches)) {
+                continue;
+            }
+
+            $lastVal = $lastValMatches[0];
+            $balance += $lastVal;
+            $debugData[$i]['lastval'] = $lastVal;
+            $debugData[$i]['balance'] = $balance;
+            $debugData[$i]['point'] = $resultData[] = [
                 $this->x_key => $i,
                 $this->y_key => round($balance, 1),
             ];
