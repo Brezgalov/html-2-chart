@@ -36,12 +36,12 @@ class HtmlParserForm extends Model
     /**
      * @var string
      */
-    public $first_name = 'x';
+    public $x_key = 'x';
 
     /**
      * @var string
      */
-    public $last_name = 'y';
+    public $y_key = 'y';
 
     /**
      * @var null|float
@@ -94,11 +94,22 @@ class HtmlParserForm extends Model
         }
 
         $resultData = [];
-        foreach (array_slice($rows, $this->value_row) as $row) {
-            $rowParseResult = $this->parseTableRow($row);
-            if (is_array($rowParseResult)) {
-                $resultData[] = $rowParseResult;
+        $balance = 0;
+        foreach (array_slice($rows, $this->value_row) as $i => $row) {
+            $columns = $row->find('td');
+            if (!$this->columnsFormatMatches($columns)) {
+                continue;
             }
+            if (!preg_match('/^[0-9]+$/', $columns[0]->plaintext)) {
+                break;
+            }
+
+            $last = array_pop($columns);
+            $balance += floatval($last->plaintext);
+            $resultData[] = [
+                $this->x_key => $i,
+                $this->y_key => round($balance, 1),
+            ];
         }
 
         $this->lastParseTime = microtime(1) - $time;
@@ -121,22 +132,7 @@ class HtmlParserForm extends Model
      */
     private function columnsFormatMatches(array $columns)
     {
-        return count($columns) >= $this->min_columns;
-    }
-
-    private function parseTableRow(\simple_html_dom_node $row)
-    {
-        $columns = $row->find('td');
-        if (!$this->columnsFormatMatches($columns)) {
-            return true;
-        }
-
-        //вернуть false если формат первой ячейки не катит и убить цикл
-
-        $last = array_pop($columns);
-        return [
-            $this->first_name => $columns[0]->plaintext,
-            $this->last_name => floatval($last->plaintext),//str_replace('.', ',', ),
-        ];
+        $total = count($columns);
+        return $total >= $this->min_columns || $columns[$total-1];
     }
 }
