@@ -12,7 +12,6 @@ function drawChart(data) {
         if (data[i].y < min) {
             min = data[i].y;
         }
-        console.log(data[i].y);
     }
 
     var ctx = document.getElementById('myChart').getContext('2d');
