@@ -5,13 +5,6 @@ namespace app\models\forms;
 use yii\base\Model;
 use yii\web\UploadedFile;
 
-/*
- * @TODO: дописать комменты и доки
- * @TODO: отрубать цикл, если найден пробел на первом месте
- * @TODO: найти на что ругается JSON.parse
- * @TODO: выставить правильно оси
- */
-
 /**
  * Class HtmlParserForm
  * @package app\models\forms
