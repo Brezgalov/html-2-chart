@@ -89,7 +89,9 @@ class HtmlParserForm extends Model
         $debugData = [];
         $resultData = [];
         $balance = 0;
-        foreach (array_slice($rows, $this->value_row) as $i => $row) {
+        $readAllowed = false;
+        $operationNumber = 1;
+        foreach ($rows as $i => $row) {
             $columns = $row->find('td');
             $debugData[$i] = [
                 'row' => $i + 1,
@@ -103,8 +105,19 @@ class HtmlParserForm extends Model
             if (!$this->columnsFormatMatches($columns)) {
                 continue;
             }
-            if (!preg_match('/^[0-9]+$/', $columns[0]->plaintext)) {
-                break;
+
+            if (!$readAllowed && $this->shouldStartReading($columns)) {
+                $readAllowed = true;
+                continue;
+            }
+
+            if ($readAllowed && $this->shouldStopReading($columns)) {
+                $readAllowed = false;
+                continue;
+            }
+
+            if (!$readAllowed) {
+                continue;
             }
 
             $lastColumn = array_pop($columns);
@@ -118,10 +131,12 @@ class HtmlParserForm extends Model
             $balance += $lastVal;
             $debugData[$i]['lastval'] = $lastVal;
             $debugData[$i]['balance'] = $balance;
-            $debugData[$i]['point'] = $resultData[] = [
-                $this->x_key => $i,
-                $this->y_key => round($balance, 1),
+            $debugData[$i]['point'] =
+            $resultData[] = [
+                $this->x_key => $operationNumber,
+                $this->y_key => round($balance, 2),
             ];
+            $operationNumber++;
         }
 
         $this->lastParseTime = microtime(1) - $time;
@@ -146,5 +161,26 @@ class HtmlParserForm extends Model
     {
         $total = count($columns);
         return $total >= $this->min_columns || $columns[$total-1];
+    }
+
+    /**
+     * @param array $columns
+     * @return bool
+     */
+    private function shouldStartReading(array $columns)
+    {
+        return
+            count($columns) == 14 &&
+            $columns[0]->plaintext == 'Ticket'
+        ;
+    }
+
+    /**
+     * @param array $columns
+     * @return bool
+     */
+    private function shouldStopReading(array $columns)
+    {
+        return !preg_match('/^[0-9]+$/', $columns[0]->plaintext);
     }
 }
